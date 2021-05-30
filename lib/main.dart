@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
+import 'dart:math' as Math;
 
 void main() {
   runApp(MyApp());
@@ -73,33 +73,36 @@ class _AnimatorState extends State<Animator>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: AppBar(
+          title: Text('Canvas'),
+        ),
         body: SafeArea(
             child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-            child: AnimatedBuilder(
-                animation: _animation,
-                builder: (context, child) {
-                  return CustomPaint(
-                    painter: TestPaint(_animation.value, _sides),
-                    child: Container(),
-                  );
-                })),
-        Slider(
-          value: _sides,
-          min: 3.0,
-          max: 10.0,
-          label: _sides.toInt().toString(),
-          divisions: 7,
-          onChanged: (value) {
-            setState(() {
-              _sides = value;
-            });
-          },
-        )
-      ],
-    )));
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+                child: AnimatedBuilder(
+                    animation: _animation,
+                    builder: (context, child) {
+                      return CustomPaint(
+                        painter: TestPaint(_animation.value, _sides),
+                        child: Container(),
+                      );
+                    })),
+            Slider(
+              value: _sides,
+              min: 3.0,
+              max: 10.0,
+              label: _sides.toInt().toString(),
+              divisions: 7,
+              onChanged: (value) {
+                setState(() {
+                  _sides = value;
+                });
+              },
+            )
+          ],
+        )));
   }
 }
 
@@ -118,29 +121,44 @@ class TestPaint extends CustomPainter {
       ..color = Colors.blue
       ..isAntiAlias = true;
 
-    var radius = size.height / 3 ?? 0; //size.width / 20;
+    var radius = Math.min(size.height, size.width) / 3 ?? 0; //size.width / 20;
     var sides = _sides; //10 * _width;
 
-    var startAngle = (math.pi * 2) * _width;
-    var angle = (math.pi * 2) / sides;
+    var startAngle = (Math.pi * 2) * _width;
+    var angle = (Math.pi * 2) / sides;
 
     Offset center = Offset(size.width / 2, size.height / 2);
 
     // startPoint => (100.0, 0.0)
     Offset startPoint =
-        Offset(radius * math.cos(startAngle), radius * math.sin(startAngle));
+        Offset(radius * Math.cos(startAngle), radius * Math.sin(startAngle));
 
     var path = Path();
     path.moveTo(startPoint.dx + center.dx, startPoint.dy + center.dy);
 
+    final smilePaint = Paint()
+      ..color = Colors.yellow
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 10;
+
     for (int i = 1; i <= sides; i++) {
-      double x = radius * math.cos(startAngle + angle * i) + center.dx;
-      double y = radius * math.sin(startAngle + angle * i) + center.dy;
+      double x = radius * Math.cos(startAngle + angle * i) + center.dx;
+      double y = radius * Math.sin(startAngle + angle * i) + center.dy;
       path.lineTo(x, y);
     }
     path.close();
     canvas.drawPath(path, paint);
+    var ex1 = radius / 1.7 * Math.cos(startAngle - Math.pi / 3) + center.dx;
+    var ey1 = radius / 1.7 * Math.sin(startAngle - Math.pi / 3) + center.dy;
+    canvas.drawCircle(Offset(ex1, ey1), radius / 10, smilePaint);
 
+    var ex2 = radius / 1.7 * Math.cos(startAngle + 1.3 * Math.pi) + center.dx;
+    var ey2 = radius / 1.7 * Math.sin(startAngle + 1.3 * Math.pi) + center.dy;
+
+    canvas.drawCircle(Offset(ex2, ey2), radius / 10, smilePaint);
+
+    canvas.drawArc(Rect.fromCircle(center: center, radius: radius / 2),
+        startAngle, Math.pi, false, smilePaint);
     // canvas.save();
     // canvas.restore();
   }
