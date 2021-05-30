@@ -43,7 +43,7 @@ class _AnimatorState extends State<Animator>
   void initState() {
     super.initState();
     _controller =
-        AnimationController(vsync: this, duration: Duration(seconds: 10));
+        AnimationController(vsync: this, duration: Duration(seconds: 5));
 
     Tween<double> tween = Tween(begin: 0.0, end: 1.0);
     _animation = tween.animate(_controller)
@@ -124,7 +124,7 @@ class TestPaint extends CustomPainter {
     var radius = Math.min(size.height, size.width) / 3 ?? 0; //size.width / 20;
     var sides = _sides; //10 * _width;
 
-    var startAngle = (Math.pi * 2) * _width;
+    var startAngle = (Math.pi * 2) * _width - Math.pi / 2;
     var angle = (Math.pi * 2) / sides;
 
     Offset center = Offset(size.width / 2, size.height / 2);
@@ -136,10 +136,13 @@ class TestPaint extends CustomPainter {
     var path = Path();
     path.moveTo(startPoint.dx + center.dx, startPoint.dy + center.dy);
 
+    final eyePaint = Paint()..color = Colors.yellow[700];
+
     final smilePaint = Paint()
-      ..color = Colors.yellow
+      ..color = Colors.yellow[700]
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 10;
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = radius / 10;
 
     for (int i = 1; i <= sides; i++) {
       double x = radius * Math.cos(startAngle + angle * i) + center.dx;
@@ -148,17 +151,20 @@ class TestPaint extends CustomPainter {
     }
     path.close();
     canvas.drawPath(path, paint);
-    var ex1 = radius / 1.7 * Math.cos(startAngle - Math.pi / 3) + center.dx;
-    var ey1 = radius / 1.7 * Math.sin(startAngle - Math.pi / 3) + center.dy;
-    canvas.drawCircle(Offset(ex1, ey1), radius / 10, smilePaint);
 
-    var ex2 = radius / 1.7 * Math.cos(startAngle + 1.3 * Math.pi) + center.dx;
-    var ey2 = radius / 1.7 * Math.sin(startAngle + 1.3 * Math.pi) + center.dy;
+    // Smile
+    var smileAngle = startAngle + Math.pi / 2;
+    var ex1 = radius / 2.5 * Math.cos(smileAngle - .35 * Math.pi) + center.dx;
+    var ey1 = radius / 2.5 * Math.sin(smileAngle - .35 * Math.pi) + center.dy;
+    canvas.drawCircle(Offset(ex1, ey1), radius / 10, eyePaint);
 
-    canvas.drawCircle(Offset(ex2, ey2), radius / 10, smilePaint);
+    var ex2 = radius / 2.5 * Math.cos(smileAngle - .65 * Math.pi) + center.dx;
+    var ey2 = radius / 2.5 * Math.sin(smileAngle - .65 * Math.pi) + center.dy;
 
-    canvas.drawArc(Rect.fromCircle(center: center, radius: radius / 2),
-        startAngle, Math.pi, false, smilePaint);
+    canvas.drawCircle(Offset(ex2, ey2), radius / 10, eyePaint);
+
+    canvas.drawArc(Rect.fromCircle(center: center, radius: radius / 2.5),
+        smileAngle, Math.pi, false, smilePaint);
     // canvas.save();
     // canvas.restore();
   }
